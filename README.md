@@ -13,7 +13,7 @@ The first step is to include the library in your project.
 In Gradle, this looks like:
 
 ```groovy
-implementation "com.frolo.rxcontent:rxcontent:1.0.0"
+implementation 'com.github.alexei-frolo:RxContent:1.0.2'
 ```
 
 ### RxContent example
