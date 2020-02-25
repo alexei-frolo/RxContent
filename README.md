@@ -13,7 +13,7 @@ The first step is to include the library in your project.
 In Gradle, this looks like:
 
 ```groovy
-implementation 'com.github.alexei-frolo:RxContent:1.0.2'
+implementation 'com.github.alexei-frolo:RxContent:1.0.3'
 ```
 
 ### RxContent example
@@ -47,9 +47,9 @@ final class Song {
             MediaStore.Audio.Media.TITLE
             };
 
-    static final Builder<Song> CURSOR_MAPPER = new Builder<Song>() {
+    static final CursorMapper<Song> CURSOR_MAPPER = new CursorMapper<Song>() {
         @Override
-        public Song build(Cursor cursor) {
+        public Song map(Cursor cursor) {
             long id = cursor.getLong(cursor.getColumnIndex(PROJECTION[0]));
             String title = cursor.getString(cursor.getColumnIndex(PROJECTION[1]));
             return new Song(id, title);
@@ -64,7 +64,7 @@ public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     ContentResolver resolver = getContentResolver();
     Executor executor = Executors.newSingleThreadExecutor();
-    Flowable<List<Song>> source = RxAdapter.query(resolver, Song.URI, Song.PROJECTION,
+    Flowable<List<Song>> source = RxContent.query(resolver, Song.URI, Song.PROJECTION,
                     null, null, null, executor, Song.CURSOR_MAPPER);
 
     source.subscribe(new Consumer<List<Song>>() {
