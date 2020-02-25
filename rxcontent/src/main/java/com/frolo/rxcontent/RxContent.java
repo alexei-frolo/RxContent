@@ -26,7 +26,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-public final class RxAdapter {
+public final class RxContent {
 
     private static final Object NOTHING = new Object();
 
@@ -47,7 +47,7 @@ public final class RxAdapter {
     }
 
     /*No instances*/
-    private RxAdapter() {
+    private RxContent() {
     }
 
     /**
@@ -64,8 +64,8 @@ public final class RxAdapter {
     }
 
     /**
-     * Creates a flowable that emits {@link RxAdapter#NOTHING} each time the specified <code>uri</code> changes.
-     * On the subscribe, {@link RxAdapter#NOTHING} is emitted at least once.
+     * Creates a flowable that emits {@link RxContent#NOTHING} each time the specified <code>uri</code> changes.
+     * On the subscribe, {@link RxContent#NOTHING} is emitted at least once.
      * <code>uri</code> is observed using {@link ContentResolver#registerContentObserver(Uri, boolean, ContentObserver)} method.
      * On the source cancellation, observation is terminated using {@link ContentResolver#unregisterContentObserver(ContentObserver)} method.
      *
@@ -115,8 +115,8 @@ public final class RxAdapter {
     }
 
     /**
-     * Creates a flowable that emits {@link RxAdapter#NOTHING} each time a uri from the specified <code>uris</code> collection changes.
-     * On the subscribe, {@link RxAdapter#NOTHING} is emitted at least once.
+     * Creates a flowable that emits {@link RxContent#NOTHING} each time a uri from the specified <code>uris</code> collection changes.
+     * On the subscribe, {@link RxContent#NOTHING} is emitted at least once.
      * <code>uris</code> are observed using {@link ContentResolver#registerContentObserver(Uri, boolean, ContentObserver)} method.
      * On the source cancellation, observation is terminated using {@link ContentResolver#unregisterContentObserver(ContentObserver)} method.
      *
@@ -208,13 +208,13 @@ public final class RxAdapter {
     }
 
     /**
-     * Creates same flowable as {@link RxAdapter#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
+     * Creates same flowable as {@link RxContent#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
      * passing as the scheduler {@link Schedulers#from(Executor)} from <code>queryExecutor</code>.
      *
-     * @param contentResolver @see {@link RxAdapter#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
-     * @param uri @see {@link RxAdapter#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
+     * @param contentResolver @see {@link RxContent#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
+     * @param uri @see {@link RxContent#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
      * @param queryExecutor from which the query scheduler is created
-     * @param callable @see {@link RxAdapter#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
+     * @param callable @see {@link RxContent#createFlowable(ContentResolver, Uri, Scheduler, Callable)}
      * @return flowable source
      */
     public static <T> Flowable<T> createFlowable(
@@ -262,13 +262,13 @@ public final class RxAdapter {
     }
 
     /**
-     * Creates same flowable as {@link RxAdapter#createFlowable(ContentResolver, List, Scheduler, Callable)}
+     * Creates same flowable as {@link RxContent#createFlowable(ContentResolver, List, Scheduler, Callable)}
      * passing as the scheduler {@link Schedulers#from(Executor)} from <code>queryExecutor</code>.
      *
-     * @param contentResolver @see {@link RxAdapter#createFlowable(ContentResolver, List, Scheduler, Callable)}
-     * @param uris @see {@link RxAdapter#createFlowable(ContentResolver, List, Scheduler, Callable)}
+     * @param contentResolver @see {@link RxContent#createFlowable(ContentResolver, List, Scheduler, Callable)}
+     * @param uris @see {@link RxContent#createFlowable(ContentResolver, List, Scheduler, Callable)}
      * @param queryExecutor from which the query scheduler is created
-     * @param callable @see {@link RxAdapter#createFlowable(ContentResolver, List, Scheduler, Callable)}
+     * @param callable @see {@link RxContent#createFlowable(ContentResolver, List, Scheduler, Callable)}
      * @return flowable source
      */
     public static <T> Flowable<T> createFlowable(
@@ -300,7 +300,7 @@ public final class RxAdapter {
      * @param selectionArgs @see {@link ContentResolver#query(Uri, String[], String, String[], String)}
      * @param sortOrder @see {@link ContentResolver#query(Uri, String[], String, String[], String)}
      * @param queryExecutor on which the query is performed
-     * @param builder for mapping the query cursor to objects of type {@link T}
+     * @param cursorMapper for mapping the query cursor to objects of type {@link T}
      * @param <T> type of the query
      * @return flowable source
      */
@@ -312,7 +312,7 @@ public final class RxAdapter {
             final String[] selectionArgs,
             final String sortOrder,
             final Executor queryExecutor,
-            final Builder<T> builder
+            final CursorMapper<T> cursorMapper
     ) {
         return createFlowable(
                 resolver,
@@ -331,7 +331,7 @@ public final class RxAdapter {
                         try {
                             if (cursor.moveToFirst()) {
                                 do {
-                                    items.add(builder.build(cursor));
+                                    items.add(cursorMapper.map(cursor));
                                 } while (cursor.moveToNext());
                             }
                         } finally {
@@ -361,7 +361,7 @@ public final class RxAdapter {
      * @param projection @see {@link ContentResolver#query(Uri, String[], String, String[], String)}
      * @param itemId @see {@link ContentResolver#query(Uri, String[], String, String[], String)}
      * @param queryExecutor on which the query is performed
-     * @param builder for mapping the query cursor to objects of type {@link T}
+     * @param cursorMapper for mapping the query cursor to objects of type {@link T}
      * @param <T> type of the query
      * @return flowable source
      */
@@ -371,7 +371,7 @@ public final class RxAdapter {
             final String[] projection,
             final long itemId,
             final Executor queryExecutor,
-            final Builder<T> builder
+            final CursorMapper<T> cursorMapper
     ) {
         final Uri itemUri = ContentUris.withAppendedId(uri, itemId);
         return createFlowable(
@@ -390,7 +390,7 @@ public final class RxAdapter {
 
                         try {
                             if (cursor.moveToFirst()) {
-                                item = builder.build(cursor);
+                                item = cursorMapper.map(cursor);
                             }
                         } finally {
                             cursor.close();

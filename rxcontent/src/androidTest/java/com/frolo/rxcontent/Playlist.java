@@ -22,9 +22,9 @@ final class Playlist {
             MediaStore.Audio.Playlists.NAME
     };
 
-    static final Builder<Playlist> BUILDER = new Builder<Playlist>() {
+    static final CursorMapper<Playlist> CURSOR_MAPPER = new CursorMapper<Playlist>() {
         @Override
-        public Playlist build(Cursor cursor) {
+        public Playlist map(Cursor cursor) {
             long id = cursor.getLong(cursor.getColumnIndex(PROJECTION[0]));
             String name = cursor.getString(cursor.getColumnIndex(PROJECTION[1]));
             return new Playlist(id, name);

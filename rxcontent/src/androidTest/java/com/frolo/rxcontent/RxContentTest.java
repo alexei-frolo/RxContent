@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @RunWith(JUnit4.class)
-public class RxAdapterTest {
+public class RxContentTest {
 
     /**
      * Max time that {@link ContentResolver} may take to dispatch Uri changes to its observers.
@@ -48,14 +48,14 @@ public class RxAdapterTest {
     private Executor mQueryExecutor;
 
     /**
-     * Executes <code>cmd</code> last in {@link RxAdapter#ObserverHandler#sInstance}'s looper.
-     * Do call this when you want to run some code after all the posted callbacks are performed in {@link RxAdapter#ObserverHandler#sInstance}.
+     * Executes <code>cmd</code> last in {@link RxContent#ObserverHandler#sInstance}'s looper.
+     * Do call this when you want to run some code after all the posted callbacks are performed in {@link RxContent#ObserverHandler#sInstance}.
      * For example, if you want to wait until
      * {@link android.database.ContentObserver#onChange(boolean, Uri)} gets called.
      * @param cmd callback to run.
      */
     private void runOnNextLoop(Runnable cmd) {
-        RxAdapter.ObserverHandler.sInstance.post(cmd);
+        RxContent.ObserverHandler.sInstance.post(cmd);
     }
 
     private void sleepSafely(long millis) {
@@ -80,7 +80,7 @@ public class RxAdapterTest {
 
         // Testing on playlists in the media store
         final Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-        Flowable<Object> source = RxAdapter.createFlowable(mResolver, uri);
+        Flowable<Object> source = RxContent.createFlowable(mResolver, uri);
         final TestSubscriber<Object> subscriber = TestSubscriber.create();
 
         source.subscribe(subscriber);
@@ -143,8 +143,8 @@ public class RxAdapterTest {
 
         // Testing on playlists in the media store
         final Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-        Flowable<List<Playlist>> source = RxAdapter.query(
-                mResolver, uri, Playlist.PROJECTION, null, null, null, mQueryExecutor, Playlist.BUILDER);
+        Flowable<List<Playlist>> source = RxContent.query(
+                mResolver, uri, Playlist.PROJECTION, null, null, null, mQueryExecutor, Playlist.CURSOR_MAPPER);
         final TestSubscriber<List<Playlist>> subscriber = TestSubscriber.create();
 
         source.subscribe(subscriber);

@@ -29,7 +29,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import com.frolo.rxcontent.Builder;
+import com.frolo.rxcontent.CursorMapper;
 
 final class Song {
     final long id;
@@ -47,7 +47,7 @@ final class Song {
             MediaStore.Audio.Media.TITLE
             };
 
-    static final Builder<Song> BUILDER = new Builder<Song>() {
+    static final Builder<Song> CURSOR_MAPPER = new Builder<Song>() {
         @Override
         public Song build(Cursor cursor) {
             long id = cursor.getLong(cursor.getColumnIndex(PROJECTION[0]));
@@ -65,7 +65,7 @@ public void onCreate(Bundle savedInstanceState) {
     ContentResolver resolver = getContentResolver();
     Executor executor = Executors.newSingleThreadExecutor();
     Flowable<List<Song>> source = RxAdapter.query(resolver, Song.URI, Song.PROJECTION,
-                    null, null, null, executor, Song.BUILDER);
+                    null, null, null, executor, Song.CURSOR_MAPPER);
 
     source.subscribe(new Consumer<List<Song>>() {
         @Override

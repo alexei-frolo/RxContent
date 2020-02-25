@@ -5,9 +5,8 @@ import android.database.Cursor;
 
 /**
  * This builds objects of type <code>T</code> using {@link Cursor}.
- * It is used by {@link RxAdapter} for mapping cursors to objects;
  */
-public interface Builder<T> {
+public interface CursorMapper<T> {
 
     /**
      * Builds an object of type <code>T</code> using <code>cursor</code>.
@@ -16,5 +15,5 @@ public interface Builder<T> {
      * @param cursor from which to build an object
      * @return an object of type T
      */
-    T build(Cursor cursor);
+    T map(Cursor cursor);
 }
